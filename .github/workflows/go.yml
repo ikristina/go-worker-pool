@@ -1,0 +1,27 @@
+name: Go CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.26"
+
+      - name: Verify dependencies
+        run: go mod verify
+
+      - name: Run Linting (vet and fmt)
+        run: make lint
+
+      - name: Run Tests with Race Detector
+        run: make test
