@@ -1,6 +1,10 @@
-.PHONY: run test race clean
+.PHONY: lint run test race clean
 
-# Run the application
+setup:
+	git config core.hooksPath scripts
+	chmod +x scripts/pre-push
+
+# Run the app
 run:
 	go run main.go
 
@@ -8,7 +12,7 @@ run:
 test:
 	go test -race ./... -v
 
-# Run with the Race Detector
+# Run the app with the race detector
 race:
 	go run -race main.go
 
