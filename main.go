@@ -8,29 +8,29 @@ import (
 	"github.com/ikristina/go-worker-pool/task"
 )
 
-const NUM_JOBS = 5 // total number of jobs (buffer)
+const NUM_JOBS = 5    // total number of jobs (buffer)
 const NUM_WORKERS = 3 // concurrency limit
 
-func worker(ctx context.Context, id int, jobs <- chan task.Job, results chan <- task.Result, wg *sync.WaitGroup) {
+func worker(ctx context.Context, id int, jobs <-chan task.Job, results chan<- task.Result, wg *sync.WaitGroup) {
 	defer wg.Done() // the worker must signal that it finished
 
 	for {
 		select {
-			case <- ctx.Done():
-				// In case of context timeout
+		case <-ctx.Done():
+			// In case of context timeout
+			return
+		case j, ok := <-jobs:
+			if !ok {
+				return //channel is closed
+			}
+			// the work
+			fmt.Printf("Worker %d started job %d\n", id, j.ID)
+			r := task.Run(ctx, &j)
+			select {
+			case results <- *r: // put the result on the channel
+			case <-ctx.Done():
 				return
-			case j, ok := <- jobs:
-				if !ok {
-					return //channel is closed
-				}
-				// the work
-				fmt.Printf("Worker %d started job %d\n", id, j.ID)
-				r := task.Run(ctx, &j)
-				select {
-					case results <- *r: // put the result on the channel
-					case <- ctx.Done():
-						return
-				}
+			}
 		}
 	}
 }
@@ -54,9 +54,9 @@ func main() {
 		urls := []string{
 			"https://go.dev",
 			"bobobo",
-		    "https://google.com",
-		    "https://github.com",
-		    "https://pkg.go.dev",
+			"https://google.com",
+			"https://github.com",
+			"https://pkg.go.dev",
 			"https://opensource.org",
 		}
 		for i, url := range urls {
@@ -83,6 +83,6 @@ func main() {
 	close(results)
 
 	// wait for the collector to finish printing everything
-	<- done
+	<-done
 	fmt.Println("all systems shut down")
 }

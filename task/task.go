@@ -9,14 +9,14 @@ import (
 
 // Result to output the result or error of the worker's job
 type Result struct {
-	ID int
+	ID    int
 	Value string
-	Err error
+	Err   error
 }
 
 // Job is an input to a worker
 type Job struct {
-	ID int
+	ID  int
 	URL string
 }
 
