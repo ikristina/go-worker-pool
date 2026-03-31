@@ -25,3 +25,7 @@ lint:
 clean:
 	go clean
 	rm -f go-worker-pool
+
+# Start prometheus and graphana
+observability:
+	docker compose up
